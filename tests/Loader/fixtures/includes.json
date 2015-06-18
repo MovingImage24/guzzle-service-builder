@@ -1,0 +1,8 @@
+{
+  "services": {
+    "dummy": {
+      "class": "Mi\\Guzzle\\Test\\TestService"
+    }
+  },
+  "includes" : ["./no_includes.json"]
+}

@@ -1,0 +1,7 @@
+{
+  "services": {
+    "test": {
+      "class": "Mi\\Guzzle\\Test\\DummyService"
+    }
+  }
+}
