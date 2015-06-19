@@ -3,6 +3,7 @@
 namespace Mi\Guzzle\ServiceBuilder\Tests\Common\Loader;
 
 use Mi\Guzzle\ServiceBuilder\Loader\JsonLoader;
+use Puli\Repository\FilesystemRepository;
 
 
 /**
@@ -22,7 +23,8 @@ class JsonLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function load()
     {
-        $config = $this->loader->load(__DIR__.'/fixtures//no_includes.json');
+
+        $config = $this->loader->load('/fixtures/no_includes.json');
 
         self::assertArrayHasKey('services', $config);
         self::assertArraySubset(['test' => ['class' => "Mi\\Guzzle\\Test\\DummyService"]], $config['services']);
@@ -33,7 +35,7 @@ class JsonLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function loadWithIncludes()
     {
-        $config = $this->loader->load(__DIR__.'/fixtures//includes.json');
+        $config = $this->loader->load('/fixtures/includes.json');
 
         self::assertArrayHasKey('services', $config);
         self::assertArraySubset(['test' => ['class' => "Mi\\Guzzle\\Test\\DummyService"]], $config['services']);
@@ -46,7 +48,7 @@ class JsonLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function loadWithIncludesAndDescription()
     {
-        $config = $this->loader->load(__DIR__.'/fixtures/includes_desc.json');
+        $config = $this->loader->load('/fixtures/includes_desc.json');
 
         self::assertArrayHasKey('services', $config);
         self::assertArraySubset(['test' => ['class' => "Mi\\Guzzle\\Test\\DummyService"]], $config['services']);
@@ -56,7 +58,9 @@ class JsonLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->loader = new JsonLoader();
+        $repo = new FilesystemRepository(__DIR__, true);
+
+        $this->loader = new JsonLoader($repo);
     }
 
 }

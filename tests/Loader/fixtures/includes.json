@@ -4,5 +4,5 @@
       "class": "Mi\\Guzzle\\Test\\TestService"
     }
   },
-  "includes" : ["./no_includes.json"]
+  "includes" : ["/fixtures/no_includes.json"]
 }

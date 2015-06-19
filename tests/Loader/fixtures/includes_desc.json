@@ -2,8 +2,8 @@
   "services": {
     "dummy": {
       "class": "Mi\\Guzzle\\Test\\TestService",
-      "description" : "desc-1.0.json"
+      "description" : "/fixtures/desc-1.0.json"
     }
   },
-  "includes" : ["./no_includes.json"]
+  "includes" : ["/fixtures/no_includes.json"]
 }
