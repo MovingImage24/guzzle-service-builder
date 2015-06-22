@@ -29,4 +29,4 @@
 
 # License
 
-This bundle is under the [MIT license](https://github.com/MovingImage24/guzzle-service-builder/blob/master/LICENSE).
+This library is under the [MIT license](https://github.com/MovingImage24/guzzle-service-builder/blob/master/LICENSE).
