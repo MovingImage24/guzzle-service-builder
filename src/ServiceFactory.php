@@ -14,13 +14,16 @@ use Mi\Guzzle\ServiceBuilder\Subscriber\ClassResponse;
 class ServiceFactory implements ServiceFactoryInterface
 {
     private $serializer;
+    private $client;
 
     /**
      * @param SerializerInterface $serializer
+     * @param Client              $client
      */
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, Client $client = null)
     {
         $this->serializer = $serializer;
+        $this->client     =  $client !== null ? $client : new Client();
     }
 
     /**
@@ -30,9 +33,11 @@ class ServiceFactory implements ServiceFactoryInterface
     {
         $class = $config['class'];
         /** @var GuzzleClient $service */
-        $desc = new Description($config['description']);
-        $service = new $class(new Client(), $desc);
+        $desc    = new Description($config['description']);
+
+        $service = new $class($this->client, $desc);
         $service->getEmitter()->attach(new ClassResponse($desc, $this->serializer));
+
         return $service;
     }
 }
