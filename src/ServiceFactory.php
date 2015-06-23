@@ -7,6 +7,7 @@ use GuzzleHttp\Command\Guzzle\Description;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use JMS\Serializer\SerializerInterface;
 use Mi\Guzzle\ServiceBuilder\Subscriber\ClassResponse;
+use Mi\Guzzle\ServiceBuilder\Subscriber\PrepareApiVersion;
 
 /**
  * @author Alexander Miehe <alexander.miehe@movingimage.com>
@@ -37,6 +38,7 @@ class ServiceFactory implements ServiceFactoryInterface
 
         $service = new $class($this->client, $desc);
         $service->getEmitter()->attach(new ClassResponse($desc, $this->serializer));
+        $service->getEmitter()->attach(new PrepareApiVersion($desc));
 
         return $service;
     }

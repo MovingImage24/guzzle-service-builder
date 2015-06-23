@@ -12,7 +12,6 @@ use JMS\Serializer\SerializerInterface;
  */
 class ClassResponse implements SubscriberInterface
 {
-
     private $serializer;
     private $description;
 
@@ -48,6 +47,10 @@ class ClassResponse implements SubscriberInterface
         $model = $operation->getServiceDescription()->getModel($modelName);
 
         if (property_exists($model, 'class') === false || !($className = $model->class)) {
+            return;
+        }
+
+        if (null === $event->getResponse()) {
             return;
         }
 

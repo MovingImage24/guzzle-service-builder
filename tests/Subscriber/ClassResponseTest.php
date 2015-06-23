@@ -80,6 +80,31 @@ class ClassResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function processWithNoResponse()
+    {
+        $event = $this->prophesize(ProcessEvent::class);
+        $command = $this->prophesize(Command::class);
+        $operation = $this->prophesize(Operation::class);
+        $serviceDescription = $this->prophesize(Description::class);
+
+        $event->getCommand()->willReturn($command->reveal());
+        $event->getResponse()->willReturn(null);
+
+        $command->getName()->willReturn('commandName');
+
+        $operation->getResponseModel()->willReturn('modelName');
+        $operation->getServiceDescription()->willReturn($serviceDescription->reveal());
+
+        $serviceDescription->getModel('modelName')->willReturn((object) ['class' => 'dummy']);
+
+        $this->description->getOperation('commandName')->willReturn($operation->reveal());
+
+        $this->classResponse->onProcess($event->reveal());
+    }
+
+    /**
+     * @test
+     */
     public function process()
     {
         $event = $this->prophesize(ProcessEvent::class);
