@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "definitions": {
+    "service": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["class", "description"]
+    }
+  },
+  "properties" : {
+    "includes" : {
+      "type" : "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "services" : {
+      "id": "http://jsonschema.net/services",
+      "type": "object",
+      "patternProperties": {
+        "\\w*": { "$ref": "#/definitions/service" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

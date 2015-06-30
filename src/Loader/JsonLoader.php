@@ -2,6 +2,8 @@
 
 namespace Mi\Guzzle\ServiceBuilder\Loader;
 
+use JsonSchema\RefResolver;
+use JsonSchema\Uri\UriRetriever;
 use Puli\Repository\Api\ResourceRepository;
 use Webmozart\Json\JsonDecoder;
 
@@ -23,17 +25,23 @@ class JsonLoader implements LoaderInterface
 
     /**
      * @param string $resource
+     * @param string $schema
      *
      * @throws \Webmozart\Json\ValidationFailedException
      *
      * @return array
      */
-    public function load($resource)
+    public function load($resource, $schemaName = 'services-schema.json')
     {
         $jsonDecoder = new JsonDecoder();
-        $jsonDecoder->setObjectDecoding(JsonDecoder::ASSOC_ARRAY);
 
-        $config = $jsonDecoder->decode($this->repository->get($resource)->getBody());
+        $retriever = new UriRetriever();
+        $schema    = $retriever->retrieve('file://' . realpath(__DIR__ . '/../../resources/schemas/' . $schemaName));
+
+        $refResolver = new RefResolver($retriever);
+        $refResolver->resolve($schema, 'file://' . __DIR__ . '/../../resources/schemas/' . $schemaName);
+
+        $config = $jsonDecoder->decode($this->repository->get($resource)->getBody(), $schema);
 
         // Keep track of this file being loaded to prevent infinite recursion
         $this->loadedFiles[$resource] = true;
@@ -44,13 +52,11 @@ class JsonLoader implements LoaderInterface
         return $config;
     }
 
-    private function includeDesc(&$config)
+    private function includeDesc($config)
     {
-        if (!empty($config['services'])) {
-            foreach ($config['services'] as &$service) {
-                if (!empty($service['description'])) {
-                    $service['description'] = $this->load($service['description']);
-                }
+        if (property_exists($config, 'services')) {
+            foreach ($config->services as $service) {
+                $service->description = $this->load($service->description, 'description-schema.json');
             }
         }
     }
@@ -62,18 +68,21 @@ class JsonLoader implements LoaderInterface
      *
      * @return array Returns the merged and included data
      */
-    protected function mergeIncludes(&$config)
+    private function mergeIncludes(&$config)
     {
-        if (!empty($config['includes'])) {
-            foreach ($config['includes'] as $path) {
+        if (property_exists($config, 'includes')) {
+            foreach ($config->includes as $path) {
 
                 // Don't load the same files more than once
                 if (!array_key_exists($path, $this->loadedFiles)) {
                     $this->loadedFiles[$path] = true;
-                    $config = array_merge_recursive($this->load($path), $config);
+                    $config                   = (object)array_merge_recursive(
+                        (array)$this->load($path),
+                        (array)$config
+                    );
                 }
             }
-            unset($config['includes']);
+            unset($config->includes);
         }
     }
 }

@@ -4,6 +4,5 @@
       "class": "Mi\\Guzzle\\Test\\TestService",
       "description" : "/fixtures/desc-1.0.json"
     }
-  },
-  "includes" : ["/fixtures/no_includes.json"]
+  }
 }

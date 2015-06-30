@@ -19,19 +19,18 @@ class JsonLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \Webmozart\Json\ValidationFailedException
+     * @expectedExceptionMessage services.test: the property description is required
      */
     public function load()
     {
-        $config = $this->loader->load('/fixtures/no_includes.json');
-
-        self::assertArrayHasKey('services', $config);
-        self::assertArraySubset(['test' => ['class' => 'Mi\\Guzzle\\Test\\DummyService']], $config['services']);
+        $this->loader->load('/fixtures/no_includes.json');
     }
 
     /**
      * @test
      */
-    public function loadWithIncludes()
+    public function loadWithIncludesAndDescription()
     {
         $config = $this->loader->load('/fixtures/includes.json');
 

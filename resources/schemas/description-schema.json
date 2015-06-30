@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "definitions": {
+    "operation": {
+      "type": "object",
+      "properties": {
+        "httpMethod": {"type": "string"},
+        "uri": {"type": "string"}
+      },
+      "additionalProperties": false,
+      "required": [
+        "httpMethod",
+        "uri"
+      ]
+    }
+  },
+  "properties": {
+    "name": {"type": "string"},
+    "apiVersion": {"type": "string"},
+    "baseUrl": {"type": "string"},
+    "description": {"type": "string"},
+    "operations": {
+      "id": "http://jsonschema.net/operation",
+      "type": "object",
+      "patternProperties": {
+        "\\w*": {"$ref": "#/definitions/operation"}
+      },
+      "additionalProperties": false
+    },
+    "models": {
+      "id": "http://jsonschema.net/model",
+      "type": "object",
+      "patternProperties": {
+        "\\w*": {"$ref": "#/definitions/model"}
+      },
+      "additionalProperties": false
+    },
+    "required": [
+      "name",
+      "apiVersion",
+      "baseUrl",
+      "description",
+      "operations",
+      "models"
+    ]
+  },
+  "additionalProperties": false
+}
