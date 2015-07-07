@@ -38,7 +38,7 @@ class ClassResponse implements SubscriberInterface
      */
     public function onProcess(ProcessEvent $event)
     {
-        $command = $event->getCommand();
+        $command   = $event->getCommand();
         $operation = $this->description->getOperation($command->getName());
         if (!($modelName = $operation->getResponseModel())) {
             return;

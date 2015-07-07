@@ -38,7 +38,6 @@ class ServiceFactory implements ServiceFactoryInterface
 
         $service = new $class($this->client, $desc);
         $service->getEmitter()->attach(new ClassResponse($desc, $this->serializer));
-        $service->getEmitter()->attach(new PrepareApiVersion($desc));
 
         return $service;
     }
