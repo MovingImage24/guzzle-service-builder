@@ -55,7 +55,5 @@ class ClassResponse implements SubscriberInterface
         }
 
         $event->setResult($this->serializer->deserialize($event->getResponse()->getBody(), $className, 'json'));
-
-        $event->stopPropagation();
     }
 }

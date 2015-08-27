@@ -116,7 +116,6 @@ class ClassResponseTest extends \PHPUnit_Framework_TestCase
         $event->getCommand()->willReturn($command->reveal());
         $event->getResponse()->willReturn($response->reveal());
         $event->setResult('deserialized')->shouldBeCalled();
-        $event->stopPropagation()->shouldBeCalled();
 
         $response->getBody()->willReturn('body');
 
