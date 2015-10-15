@@ -6,7 +6,6 @@ use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use Mi\Guzzle\ServiceBuilder\Loader\JsonLoader;
 use Mi\Guzzle\ServiceBuilder\ServiceBuilder;
 use Mi\Guzzle\ServiceBuilder\ServiceFactory;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**

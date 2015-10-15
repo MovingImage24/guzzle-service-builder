@@ -24,8 +24,9 @@ class JsonLoader implements LoaderInterface
     /**
      * @param string $resource
      *
-     * @return array
      * @throws \Webmozart\Json\ValidationFailedException
+     *
+     * @return array
      */
     public function load($resource)
     {
@@ -55,9 +56,9 @@ class JsonLoader implements LoaderInterface
     }
 
     /**
-     * Merges in all include files
+     * Merges in all include files.
      *
-     * @param array  $config   Config data that contains includes
+     * @param array $config Config data that contains includes
      *
      * @return array Returns the merged and included data
      */
@@ -69,11 +70,10 @@ class JsonLoader implements LoaderInterface
                 // Don't load the same files more than once
                 if (!array_key_exists($path, $this->loadedFiles)) {
                     $this->loadedFiles[$path] = true;
-                    $config                   = array_merge_recursive($this->load($path), $config);
+                    $config = array_merge_recursive($this->load($path), $config);
                 }
             }
             unset($config['includes']);
         }
     }
-
 }

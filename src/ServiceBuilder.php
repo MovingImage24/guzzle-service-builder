@@ -21,9 +21,9 @@ class ServiceBuilder implements ServiceBuilderInterface
      */
     public function __construct(LoaderInterface $loader, ServiceFactoryInterface $serviceFactory, $resource)
     {
-        $this->loader         = $loader;
+        $this->loader = $loader;
         $this->serviceFactory = $serviceFactory;
-        $this->config         = $this->loader->load($resource)['services'];
+        $this->config = $this->loader->load($resource)['services'];
     }
 
     /**
@@ -32,7 +32,6 @@ class ServiceBuilder implements ServiceBuilderInterface
     public function get($name)
     {
         if (!array_key_exists($name, $this->config)) {
-
             throw new \RuntimeException('No service is registered as ' . $name);
         }
 
@@ -40,9 +39,9 @@ class ServiceBuilder implements ServiceBuilderInterface
             return $this->services[$name];
         }
 
-        $builder =& $this->config[$name];
+        $builder = &$this->config[$name];
 
-        $service               = $this->serviceFactory->factory($builder);
+        $service = $this->serviceFactory->factory($builder);
         $this->services[$name] = $service;
 
         return $service;
