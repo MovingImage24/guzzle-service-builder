@@ -6,6 +6,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/mi/guzzle-service-builder/v/unstable)](https://packagist.org/packages/mi/guzzle-service-builder)
 [![Total Downloads](https://poser.pugx.org/mi/guzzle-service-builder/downloads)](https://packagist.org/packages/mi/guzzle-service-builder)
 [![License](https://poser.pugx.org/mi/guzzle-service-builder/license)](https://packagist.org/packages/mi/guzzle-service-builder)
+[![StyleCI](https://styleci.io/repos/37664296/shield)](https://styleci.io/repos/37664296)
 
 ## Overview
 
