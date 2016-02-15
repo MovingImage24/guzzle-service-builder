@@ -3,11 +3,232 @@
   "id": "http://jsonschema.net",
   "type": "object",
   "definitions": {
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "enum": [
+            "uri",
+            "query",
+            "header",
+            "body",
+            "json",
+            "xml",
+            "postField",
+            "postFile"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sentAs": {
+          "type": "string"
+        },
+        "$ref": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "static": {
+          "type": "boolean"
+        },
+        "default": {},
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data": {
+          "type": "array"
+        },
+        "format": {
+          "enum": [
+            "date-time",
+            "date",
+            "time",
+            "timestamp",
+            "date-time-http",
+            "boolean-string"
+          ]
+        },
+        "additionalProperties": {},
+        "oneOf": [
+          {
+            "type": {
+              "enum": [
+                "string"
+              ]
+            },
+            "pattern": {
+              "type": "string"
+            },
+            "enum": {
+              "type": "array"
+            },
+            "minLength": {
+              "type": "integer"
+            },
+            "maxLength": {
+              "type": "integer"
+            }
+          },
+          {
+            "type": {
+              "enum": [
+                "object"
+              ]
+            },
+            "properties": {}
+          },
+          {
+            "type": {
+              "enum": [
+                "integer",
+                "number",
+                "numeric"
+              ]
+            },
+            "minimum": {
+              "type": "integer"
+            },
+            "maximum": {
+              "type": "integer"
+            }
+          },
+          {
+            "type": {
+              "enum": [
+                "array"
+              ]
+            },
+            "items": {},
+            "minItems": {
+              "type": "integer"
+            },
+            "maxItems": {
+              "type": "integer"
+            }
+          },
+          {
+            "type": {
+              "enum": [
+                "boolean",
+                "null",
+                "any"
+              ]
+            }
+          }
+        ]
+      },
+      "additionalProperties": false
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "$ref": "#/definitions/parameter"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "class"
+          ]
+        },
+        {
+          "required": [
+            "type",
+            "additionalProperties"
+          ]
+        }
+      ]
+    },
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "reason",
+        "class"
+      ]
+    },
     "operation": {
       "type": "object",
       "properties": {
-        "httpMethod": {"type": "string"},
-        "uri": {"type": "string"}
+        "httpMethod": {
+          "enum": [
+            "GET",
+            "HEAD",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "POST",
+            "OPTIONS",
+            "TRACE",
+            "CONNECT"
+          ]
+        },
+        "uri": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "documentationUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "responseModel": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/parameter"
+          }
+        },
+        "deprecated": {
+          "type": "boolean",
+          "default": false
+        },
+        "errorResponse": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/errorResponse"
+          }
+        },
+        "additionalParameters": {
+          "$ref": "#/definitions/parameter"
+        },
+        "data": {
+          "type": "array"
+        }
       },
       "additionalProperties": false,
       "required": [
@@ -17,15 +238,25 @@
     }
   },
   "properties": {
-    "name": {"type": "string"},
-    "apiVersion": {"type": "string"},
-    "baseUrl": {"type": "string"},
-    "description": {"type": "string"},
+    "name": {
+      "type": "string"
+    },
+    "apiVersion": {
+      "type": "string"
+    },
+    "baseUrl": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
     "operations": {
       "id": "http://jsonschema.net/operation",
       "type": "object",
       "patternProperties": {
-        "\\w*": {"$ref": "#/definitions/operation"}
+        "\\w*": {
+          "$ref": "#/definitions/operation"
+        }
       },
       "additionalProperties": false
     },
@@ -33,18 +264,16 @@
       "id": "http://jsonschema.net/model",
       "type": "object",
       "patternProperties": {
-        "\\w*": {"$ref": "#/definitions/model"}
+        "\\w*": {
+          "$ref": "#/definitions/model"
+        }
       },
       "additionalProperties": false
-    },
-    "required": [
-      "name",
-      "apiVersion",
-      "baseUrl",
-      "description",
-      "operations",
-      "models"
-    ]
+    }
   },
-  "additionalProperties": false
+  "required": [
+    "name",
+    "apiVersion",
+    "description"
+  ]
 }

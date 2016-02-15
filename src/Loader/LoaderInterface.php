@@ -2,6 +2,8 @@
 
 namespace Mi\Guzzle\ServiceBuilder\Loader;
 
+use Mi\Guzzle\ServiceBuilder\Configuration\ServicesConfiguration;
+
 /**
  * @author Alexander Miehe <alexander.miehe@movingimage.com>
  */
@@ -10,7 +12,7 @@ interface LoaderInterface
     /**
      * @param string $resource file path
      *
-     * @return array
+     * @return ServicesConfiguration
      */
-    public function load($resource);
+    public function loadServices($resource);
 }

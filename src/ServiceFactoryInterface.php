@@ -3,6 +3,7 @@
 namespace Mi\Guzzle\ServiceBuilder;
 
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServiceConfiguration;
 
 /**
  * @author Alexander Miehe <alexander.miehe@movingimage.com>
@@ -10,9 +11,9 @@ use GuzzleHttp\Command\Guzzle\GuzzleClient;
 interface ServiceFactoryInterface
 {
     /**
-     * @param array $config
+     * @param ServiceConfiguration $config
      *
      * @return GuzzleClient
      */
-    public function factory($config);
+    public function factory(ServiceConfiguration $config);
 }

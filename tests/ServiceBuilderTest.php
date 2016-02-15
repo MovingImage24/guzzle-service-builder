@@ -3,7 +3,9 @@
 namespace Mi\Guzzle\ServiceBuilder\Tests;
 
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
-use Mi\Guzzle\ServiceBuilder\Loader\JsonLoader;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServiceConfiguration;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServicesConfiguration;
+use Mi\Guzzle\ServiceBuilder\Loader\LoaderInterface;
 use Mi\Guzzle\ServiceBuilder\ServiceBuilder;
 use Mi\Guzzle\ServiceBuilder\ServiceFactory;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -31,26 +33,9 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
     private $loader;
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage No service is registered as test
-     * @test
+     * @var ObjectProphecy
      */
-    public function getWrongClient()
-    {
-        $this->serviceBuilder->get('test');
-    }
-
-    /**
-     * @test
-     */
-    public function getClient()
-    {
-        $client = $this->prophesize(GuzzleClient::class);
-
-        $this->serviceFactory->factory(['config'])->willReturn($client->reveal());
-
-        self::assertEquals($client->reveal(), $this->serviceBuilder->get('dummy'));
-    }
+    private $servicesConfiguration;
 
     /**
      * @test
@@ -58,8 +43,11 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
     public function instantiateClientOnlyOnce()
     {
         $client = $this->prophesize(GuzzleClient::class);
+        $serviceConfiguration = $this->prophesize(ServiceConfiguration::class);
 
-        $this->serviceFactory->factory(['config'])->willReturn($client->reveal())->shouldBeCalledTimes(1);
+        $this->servicesConfiguration->getServiceConfiguration('dummy')->willReturn($serviceConfiguration->reveal());
+
+        $this->serviceFactory->factory($serviceConfiguration->reveal())->willReturn($client->reveal())->shouldBeCalledTimes(1);
 
         self::assertEquals($client->reveal(), $this->serviceBuilder->get('dummy'));
         self::assertEquals($client->reveal(), $this->serviceBuilder->get('dummy'));
@@ -67,10 +55,11 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->servicesConfiguration = $this->prophesize(ServicesConfiguration::class);
         $this->serviceFactory = $this->prophesize(ServiceFactory::class);
-        $this->loader = $this->prophesize(JsonLoader::class);
+        $this->loader = $this->prophesize(LoaderInterface::class);
 
-        $this->loader->load('resource_path')->willReturn(['services' => ['dummy' => ['config']]]);
+        $this->loader->loadServices('resource_path')->willReturn($this->servicesConfiguration->reveal());
 
         $this->serviceBuilder = new ServiceBuilder($this->loader->reveal(), $this->serviceFactory->reveal(), 'resource_path');
     }

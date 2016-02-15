@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Command\Guzzle\Description;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use JMS\Serializer\SerializerInterface;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServiceConfiguration;
 use Mi\Guzzle\ServiceBuilder\Subscriber\ClassResponse;
 
 /**
@@ -29,14 +30,13 @@ class ServiceFactory implements ServiceFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function factory($config)
+    public function factory(ServiceConfiguration $config)
     {
-        $class = $config['class'];
-        $desc = new Description($config['description']);
+        $class = $config->getFqcn();
 
         /** @var GuzzleClient $service */
-        $service = new $class($this->client, $desc);
-        $service->getEmitter()->attach(new ClassResponse($desc, $this->serializer));
+        $service = new $class($this->client, $config->getDescription());
+        $service->getEmitter()->attach(new ClassResponse($config->getDescription(), $this->serializer));
 
         return $service;
     }

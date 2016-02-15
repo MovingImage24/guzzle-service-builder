@@ -1,3 +1,6 @@
 {
-  "name": "dummy client"
+  "name": "dummy client",
+  "apiVersion" : "2.0",
+  "baseUrl": "url",
+  "description": ""
 }

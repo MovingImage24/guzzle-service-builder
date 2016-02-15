@@ -2,8 +2,11 @@
 
 namespace Mi\Guzzle\ServiceBuilder\Loader;
 
+use GuzzleHttp\Command\Guzzle\Description;
 use JsonSchema\RefResolver;
 use JsonSchema\Uri\UriRetriever;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServiceConfiguration;
+use Mi\Guzzle\ServiceBuilder\Configuration\ServicesConfiguration;
 use Puli\Repository\Api\ResourceRepository;
 use Webmozart\Json\JsonDecoder;
 
@@ -14,75 +17,123 @@ class JsonLoader implements LoaderInterface
 {
     private $repository;
     private $loadedFiles;
+    private $jsonDecoder;
+    private $servicesSchema;
+    private $descriptionSchema;
 
     /**
      * @param ResourceRepository $repository
+     * @param string             $servicesSchemaPath
+     * @param string             $descriptionSchemaPath
      */
-    public function __construct(ResourceRepository $repository)
-    {
+    public function __construct(
+        ResourceRepository $repository,
+        $servicesSchemaPath = null,
+        $descriptionSchemaPath = null
+    ) {
         $this->repository = $repository;
+        $this->jsonDecoder = new JsonDecoder();
+
+        if ($servicesSchemaPath !== null) {
+            $this->servicesSchema = $this->getSchema($servicesSchemaPath);
+        }
+
+        if ($descriptionSchemaPath !== null) {
+            $this->descriptionSchema = $this->getSchema($descriptionSchemaPath);
+        }
     }
 
     /**
      * @param string $resource
-     * @param string $schema
      *
      * @throws \Webmozart\Json\ValidationFailedException
+     * @throws \Webmozart\Json\DecodingFailedException
+     * @throws \Webmozart\Json\InvalidSchemaException
+     * @throws \Puli\Repository\Api\ResourceNotFoundException
+     * @throws \InvalidArgumentException
      *
-     * @return array
+     * @return ServicesConfiguration
      */
-    public function load($resource, $schemaName = 'services-schema.json')
+    public function loadServices($resource)
     {
-        $jsonDecoder = new JsonDecoder();
+        $services = $this->jsonDecoder->decode($this->repository->get($resource)->getBody(), $this->servicesSchema);
 
-        $retriever = new UriRetriever();
-        $schema    = $retriever->retrieve('file://' . realpath(__DIR__ . '/../../resources/schemas/' . $schemaName));
-
-        $refResolver = new RefResolver($retriever);
-        $refResolver->resolve($schema, 'file://' . __DIR__ . '/../../resources/schemas/' . $schemaName);
-
-        $config = $jsonDecoder->decode($this->repository->get($resource)->getBody(), $schema);
-
-        // Keep track of this file being loaded to prevent infinite recursion
         $this->loadedFiles[$resource] = true;
 
-        $this->includeDesc($config);
-        $this->mergeIncludes($config);
-
-        return $config;
-    }
-
-    private function includeDesc($config)
-    {
-        if (property_exists($config, 'services')) {
-            foreach ($config->services as $service) {
-                $service->description = $this->load($service->description, 'description-schema.json');
-            }
-        }
+        return $this->buildServicesConfiguration($services);
     }
 
     /**
-     * Merges in all include files.
+     * @param object $servicesObject
      *
-     * @param array $config Config data that contains includes
+     * @throws \Webmozart\Json\ValidationFailedException
+     * @throws \Webmozart\Json\DecodingFailedException
+     * @throws \Webmozart\Json\InvalidSchemaException
+     * @throws \Puli\Repository\Api\ResourceNotFoundException
+     * @throws \InvalidArgumentException
      *
-     * @return array Returns the merged and included data
+     * @return ServicesConfiguration
      */
-    private function mergeIncludes(&$config)
+    private function buildServicesConfiguration($servicesObject)
     {
-        if (property_exists($config, 'includes')) {
-            foreach ($config->includes as $path) {
+        $services = new ServicesConfiguration();
+        if (property_exists($servicesObject, 'services')) {
+            foreach ($servicesObject->services as $name => $service) {
+                $services->addService(
+                    new ServiceConfiguration($name, $service->class, $this->loadDescription($service->description))
+                );
+            }
+        }
 
-                // Don't load the same files more than once
+        if (property_exists($servicesObject, 'includes')) {
+            foreach ($servicesObject->includes as $path) {
                 if (!array_key_exists($path, $this->loadedFiles)) {
                     $this->loadedFiles[$path] = true;
-                    $config                   = (object)array_merge_recursive(
-                        (array)$this->load($path),
-                        (array)$config
-                    );
+                    $services->mergeServicesConfiguration($this->loadServices($path));
                 }
             }
-            unset($config->includes);
         }
+
+        return $services;
+    }
+
+    /**
+     * @param string $resource
+     *
+     * @throws \Webmozart\Json\ValidationFailedException
+     * @throws \Webmozart\Json\DecodingFailedException
+     * @throws \Webmozart\Json\InvalidSchemaException
+     * @throws \Puli\Repository\Api\ResourceNotFoundException
+     * @throws \InvalidArgumentException
+     *
+     * @return Description
+     */
+    private function loadDescription($resource)
+    {
+        $descriptionObject = $this->jsonDecoder->decode(
+            $this->repository->get($resource)->getBody(),
+            $this->descriptionSchema
+        );
+
+        return new Description((array) $descriptionObject);
+    }
+
+
+    /**
+     * @param string $schemaPath
+     *
+     * @return object
+     */
+    private function getSchema($schemaPath)
+    {
+        $schemaUri = 'file://' . realpath($schemaPath);
+
+        $retriever = new UriRetriever();
+        $schema = $retriever->retrieve($schemaUri);
+
+        $refResolver = new RefResolver($retriever);
+        $refResolver->resolve($schema, $schemaUri);
+
+        return $schema;
     }
 }
