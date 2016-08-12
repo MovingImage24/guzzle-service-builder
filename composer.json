@@ -10,8 +10,8 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "~5.0",
-    "guzzlehttp/guzzle-services": "^0.5.0",
+    "guzzlehttp/guzzle": "~6.0",
+    "guzzlehttp/guzzle-services": "dev-guzzle6",
     "webmozart/json": "^1.0",
     "jms/serializer": "^1.0",
     "puli/repository": "^1.0@beta"
